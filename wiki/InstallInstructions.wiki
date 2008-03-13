@@ -1,3 +1,6 @@
+#summary Installation hints.
+#labels Featured,Phase-Deploy
+
 = Introduction =
 
 This page will assist you in installing schemafinder.
