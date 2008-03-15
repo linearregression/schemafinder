@@ -1,4 +1,4 @@
-#summary Wiki is misbehaving; these are the "real" installation instructions; ignore the others
+#summary Installation hints.
 #labels Featured,Phase-Deploy
 
 = Introduction =
