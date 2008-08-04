@@ -1,0 +1,52 @@
+ERLCFLAGS = $(FW_ERLCFLAGS) @APPINSPECT@ @MNESIA_EXT@
+DIALYZERFLAGS = @APPINSPECT@ @MNESIA_EXT@
+
+dist_erlappsrc_DATA = 		\
+  $(filter-out mnesia%, $(wildcard *.erl))
+
+erlappsrc_DATA =		\
+  mnesia_dumper.erl		\
+  mnesia_frag.erl		\
+  mnesia_schema.erl
+
+dist_erlappinclude_DATA =	\
+  $(wildcard *.hrl)
+
+dist_erlapppriv_DATA =		\
+  $(wildcard *.erl.patch)
+
+erlappebin_SCRIPTS =							\
+  @FW_PACKAGE_NAME@.app							\
+  $(patsubst %.erl, %.beam, $(dist_erlappsrc_DATA) $(erlappsrc_DATA))
+
+.dialyzer_ok_no_mnesia: $(filter-out mnesia%, $(wildcard *.erl))
+	dialyzer --src -c $^
+	touch $@
+
+check_DATA =			\
+  .dialyzer_ok_no_mnesia
+
+%.erl.tmp: %.erl.patch
+	@cp @MNESIALOC@/$*.erl $*.erl.tmp
+	@patch $*.erl.tmp $*.erl.patch
+
+%.erl: %.erl.tmp
+	@head -5 $*.erl.tmp | grep '^%% @hidden' >/dev/null 2>/dev/null; if test $$? != 0; then { echo "%% @hidden"; cat $*.erl.tmp; } > $*.erl; else cp $*.erl.tmp $*.erl; fi
+
+mnesia_dumper_ERLCFLAGS =	\
+  -I @MNESIALOC@
+
+mnesia_frag_ERLCFLAGS =		\
+  -I @MNESIALOC@
+
+mnesia_schema_ERLCFLAGS =	\
+  -I @MNESIALOC@
+
+CLEANFILES += 			\
+  mnesia_dumper.erl		\
+  mnesia_frag.erl		\
+  mnesia_schema.erl		\
+  .dialyzer_ok_no_mnesia	\
+  $(wildcard *.orig)		\
+  $(wildcard *.rej)		\
+  $(wildcard *.tmp)
