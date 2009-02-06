@@ -27,7 +27,6 @@ FW_PACKAGE_BUILD_DEPENDS="appinspect,
                           combonodefinder,
                           gencron,
                           mnesia,
-                          mnesiaexplt,
                           n54etsbugfix,
                           n54-dupload-conf,
                           tcerl"
