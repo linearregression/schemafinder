@@ -50,12 +50,12 @@ wait_for_node () \
       receive after 1000 -> ok end,
       Host = lists:last (string:tokens (atom_to_list (node ()), "@")),
       Other = hd (init:get_plain_arguments ()),
-      pong = net_adm:ping (list_to_atom (Other ++ "@" ++ Host)),
       While = fun (F, W) -> case F () of false -> ok; 
                                          true -> receive after 1000 -> ok end,
                                                  W (F, W)
                             end
               end,
+      While (fun () -> pang =:= net_adm:ping (list_to_atom (Other ++ "@" ++ Host)) end, While),
       While (fun () -> rpc:call (list_to_atom (Other ++ "@" ++ Host), erlang, whereis, [ hello ]) =:= undefined end, While),
       Pid = rpc:call (list_to_atom (Other ++ "@" ++ Host), erlang, whereis, [ hello ]),
       true = erlang:is_pid (Pid),

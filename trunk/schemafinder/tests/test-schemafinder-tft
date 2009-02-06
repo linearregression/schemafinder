@@ -28,6 +28,24 @@ cleanup () {
 ' -noshell -noinput -s erlang halt
 }
 
+wait_for_node () \
+  {
+    erl -hidden -pa ../src -sname wazzup$pid      \
+        -noshell -noinput -eval '
+      Host = lists:last (string:tokens (atom_to_list (node ()), "@")),
+      Other = hd (init:get_plain_arguments ()),
+      OtherNode = list_to_atom (Other ++ "@" ++ Host),
+      While = fun (F, W) -> case F () of false -> ok; 
+                                         true -> receive after 1000 -> ok end,
+                                                 W (F, W)
+                            end
+              end,
+      While (fun () -> pang =:= net_adm:ping (OtherNode) end, While),
+      While (fun () -> rpc:call (OtherNode, erlang, whereis, [ schemafindersrv ]) =:= undefined end, While),
+      ok
+    ' -s erlang halt -extra "$1" || exit 1
+  }
+
 rm -rf Mnesia*
 
 {
@@ -41,7 +59,7 @@ erl -pa ../src -sname schemafinder_test1 -s combonodefinder -eval '
   receive after 30000 -> ok end
 ' -noshell -noinput -s init stop &
 
-sleep 2
+wait_for_node schemafinder_test1
 
 erl -pa ../src -sname schemafinder_test2 -s combonodefinder -eval '
   { ok, [ App ] } = file:consult ("../src/schemafinder.app"),
@@ -53,7 +71,7 @@ erl -pa ../src -sname schemafinder_test2 -s combonodefinder -eval '
   receive after 30000 -> ok end
 ' -noshell -noinput -s init stop &
 
-sleep 2
+wait_for_node schemafinder_test2
 
 erl -pa ../src -sname schemafinder_test3 -s combonodefinder -eval '
   { ok, [ App ] } = file:consult ("../src/schemafinder.app"),
