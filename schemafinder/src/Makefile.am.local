@@ -31,7 +31,7 @@ check_DATA =			\
 
 %.erl.tmp: %.erl.patch
 	@cp @MNESIALOC@/$*.erl $*.erl.tmp
-	@patch $*.erl.tmp $*.erl.patch
+	@patch -N $*.erl.tmp $*.erl.patch || test $$? != 2
 
 %.erl: %.erl.tmp
 	@head -5 $*.erl.tmp | grep '^%% @hidden' >/dev/null 2>/dev/null; if test $$? != 0; then { echo "%% @hidden"; cat $*.erl.tmp; } > $*.erl; else cp $*.erl.tmp $*.erl; fi
