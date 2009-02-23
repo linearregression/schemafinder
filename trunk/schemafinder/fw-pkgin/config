@@ -44,7 +44,7 @@ FW_ERL_APP_ENVIRONMENT="[ { node_finder, combonodefinder },
                           { check_interval_secs, 900 }, 
                           { node_timeout_secs, 14400 },
                           { load_timeout_ms, 30000 },
-                          { foreign_key_bugfix, true },
+                          { foreign_key_bugfix, false },
                           { no_table_loaders, 100 },
                           { mnesia_tm_prio, high },
                           { delirium_load_order, 255 } ]"
