@@ -1,4 +1,7 @@
-Version 3.0.2 [ NOT YET RELEASED ]
+Version 3.0.3
+  * exact dep on mnesia
+
+Version 3.0.2
   * DIALYZERFLAGS += 
   * improved synchronization in test scripts
 

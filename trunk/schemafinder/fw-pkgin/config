@@ -17,7 +17,7 @@ FW_PACKAGE_ARCHITECTURE_DEPENDENT="0"
 FW_PACKAGE_DEPENDS="appinspect,
                     combonodefinder,
                     gencron,
-                    mnesia,
+                    mnesia (= INSTALLED),
                     n54etsbugfix,
                     tcerl"
 FW_PACKAGE_CONFLICTS="delirium, n54-service-erlang (<< 1.0.18)"
