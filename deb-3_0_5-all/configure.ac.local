@@ -1,0 +1,34 @@
+dnl -- include additional autoconf commands here
+dnl -- do not include AC_OUTPUT, this is called for you
+
+AC_MSG_CHECKING([for mnesia location...])
+
+MNESIALOC=`ERL_CRASH_DUMP=/dev/null erl -noinput -noshell -eval 'io:format ("~s/src", [[ code:lib_dir (mnesia) ]]).' -s erlang halt`
+
+test $? = 0 || AC_MSG_ERROR([cant find mnesia installation])
+
+AC_MSG_RESULT([$MNESIALOC])
+
+FW_SUBST_PROTECT([MNESIALOC])
+
+AC_PATH_PROG([PATCH], [patch], [none])
+
+test "x$PATCH" = xnone && AC_MSG_ERROR([can't find patch])
+
+FW_TEMPLATE_ERLANG_CHECK_MODULE([appinspect], 
+                                [APPINSPECT="-DHAVE_APPINSPECT=1"],
+				[APPINSPECT=""])
+
+AC_SUBST([APPINSPECT])
+
+FW_TEMPLATE_ERLANG_CHECK_MODULE([mnesia_ext],
+                                [HAVE_MNESIA_EXT="yes"; MNESIA_EXT="-DMNESIA_EXT=1"],
+                                [HAVE_MNESIA_EXT="no"])
+
+FW_SUBST_PROTECT([HAVE_MNESIA_EXT])
+FW_SUBST_PROTECT([MNESIA_EXT])
+
+if test "$HAVE_MNESIA_EXT" = yes
+  then
+    AC_MSG_NOTICE([mnesia storage api extensions detected])
+  fi
