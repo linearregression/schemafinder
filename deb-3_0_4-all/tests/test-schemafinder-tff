@@ -1,0 +1,99 @@
+#! /bin/sh
+
+ERL_CRASH_DUMP=${ERL_CRASH_DUMP-/dev/null}
+export ERL_CRASH_DUMP
+
+# This file tests true/false/false
+
+# There are basically 6 tests:
+# 
+# existing directory      reuse_schema    external_db_nodes
+# false                   false           false
+# false                   true            false
+# true                    false           false
+# true                    false           true
+# true                    true            false
+# true                    true            true
+# 
+# NB: false/false/true is not possible so not tested.
+#     false/true/true is not possible so not tested.
+
+cleanup () { 
+  erl -pa ../src -sname schemafinder_killah -eval '
+    "schemafinder_killah@" ++ Host = atom_to_list (node ()),
+    Other = list_to_atom ("schemafinder_test1@" ++ Host),
+    MoreOther = list_to_atom ("schemafinder_test2@" ++ Host),
+    rpc:call (Other, erlang, halt, []),
+    rpc:call (MoreOther, erlang, halt, [])
+' -noshell -noinput -s erlang halt
+}
+
+wait_for_node () \
+  {
+    erl -hidden -pa ../src -sname wazzup$pid      \
+        -noshell -noinput -eval '
+      Host = lists:last (string:tokens (atom_to_list (node ()), "@")),
+      Other = hd (init:get_plain_arguments ()),
+      OtherNode = list_to_atom (Other ++ "@" ++ Host),
+      While = fun (F, W) -> case F () of false -> ok; 
+                                         true -> receive after 1000 -> ok end,
+                                                 W (F, W)
+                            end
+              end,
+      While (fun () -> pang =:= net_adm:ping (OtherNode) end, While),
+      While (fun () -> rpc:call (OtherNode, erlang, whereis, [ schemafindersrv ]) =:= undefined end, While),
+      ok
+    ' -s erlang halt -extra "$1" || exit 1
+  }
+
+rm -rf Mnesia*
+
+{
+erl -pa ../src -sname schemafinder_test1 -s mnesia -eval '
+  { atomic, ok } = mnesia:change_table_copy_type (schema, node (), disc_copies)
+' -noshell -noinput -s init stop
+
+erl -pa ../src -sname schemafinder_test1 -s combonodefinder -eval '
+  { ok, [ App ] } = file:consult ("../src/schemafinder.app"),
+  ok = application:load (App),
+  application:set_env (schemafinder, reuse_schema, false),
+  application:set_env (schemafinder, save_schema, false),
+  application:set_env (schemafinder, foreign_key_bugfix, false),
+  schemafinder:start (),
+  receive after 30000 -> ok end
+' -noshell -noinput -s erlang halt &
+
+wait_for_node schemafinder_test1
+
+erl -pa ../src -sname schemafinder_test2 -s combonodefinder -eval '
+  { ok, [ App ] } = file:consult ("../src/schemafinder.app"),
+  ok = application:load (App),
+  application:set_env (schemafinder, reuse_schema, false),
+  application:set_env (schemafinder, save_schema, false),
+  application:set_env (schemafinder, foreign_key_bugfix, false),
+  schemafinder:start (),
+  receive after 30000 -> ok end
+' -noshell -noinput -s erlang halt &
+
+wait_for_node schemafinder_test2
+
+erl -pa ../src -sname schemafinder_test3 -s combonodefinder -eval '
+  { ok, [ App ] } = file:consult ("../src/schemafinder.app"),
+  ok = application:load (App),
+  application:set_env (schemafinder, reuse_schema, false),
+  application:set_env (schemafinder, save_schema, false),
+  application:set_env (schemafinder, foreign_key_bugfix, false),
+  schemafinder:start (),
+  "schemafinder_test3@" ++ Host = atom_to_list (node ()),
+  Other = list_to_atom ("schemafinder_test1@" ++ Host),
+  MoreOther = list_to_atom ("schemafinder_test2@" ++ Host),
+  Self = node (),
+  [ Other, MoreOther, Self ] = lists:sort (mnesia:system_info (running_db_nodes))
+' -noshell -noinput -s erlang halt || { cleanup; exit 1; }
+} > test-schemafinder-tff.out
+
+cleanup
+
+rm -rf Mnesia*
+
+exit 0
