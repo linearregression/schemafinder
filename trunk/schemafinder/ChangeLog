@@ -1,3 +1,6 @@
+Version 3.0.4
+  * track mnesiaex bugfixes
+
 Version 3.0.3
   * exact dep on mnesia
 
