@@ -48,4 +48,4 @@ FW_ERL_APP_ENVIRONMENT="[ { node_finder, combonodefinder },
                           { delirium_load_order, 255 } ]"
 
 FW_ERL_PREREQ_APPLICATIONS_EXTRA="[ combonodefinder, n54etsbugfix, tcerl ]"
-FW_ERL_APP_EXTRA="{ included_applications, [ mnesia ] }"
+FW_ERL_APP_EXTRA="[ { included_applications, [ mnesia ] } ]"
