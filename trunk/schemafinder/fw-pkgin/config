@@ -2,7 +2,7 @@
 # environment variable FW_PACKAGE_DEFAULT_MAINTAINER if non-empty
 
 FW_PACKAGE_NAME="schemafinder"
-FW_PACKAGE_VERSION="3.0.5"
+FW_PACKAGE_VERSION="3.0.6"
 FW_PACKAGE_MAINTAINER="Paul Mineiro <paul-fw@mineiro.com>"
 FW_PACKAGE_SHORT_DESCRIPTION="Mnesia schema discovery service."
 FW_PACKAGE_DESCRIPTION="`cat README`"
@@ -14,8 +14,7 @@ FW_PACKAGE_ARCHITECTURE_DEPENDENT="0"
 # 
 # For other packaging systems, the syntax is translated for you.
 
-FW_PACKAGE_DEPENDS="appinspect,
-                    combonodefinder,
+FW_PACKAGE_DEPENDS="combonodefinder,
                     gencron,
                     mnesia (= INSTALLED),
                     n54etsbugfix,
@@ -23,8 +22,7 @@ FW_PACKAGE_DEPENDS="appinspect,
 FW_PACKAGE_CONFLICTS="delirium, n54-service-erlang (<< 1.0.18)"
 FW_PACKAGE_PROVIDES="delirium"
 
-FW_PACKAGE_BUILD_DEPENDS="appinspect, 
-                          combonodefinder,
+FW_PACKAGE_BUILD_DEPENDS="combonodefinder,
                           gencron,
                           mnesia,
                           n54etsbugfix,
@@ -49,5 +47,5 @@ FW_ERL_APP_ENVIRONMENT="[ { node_finder, combonodefinder },
                           { mnesia_tm_prio, high },
                           { delirium_load_order, 255 } ]"
 
-FW_ERL_PREREQ_APPLICATIONS_EXTRA="combonodefinder, n54etsbugfix, tcerl"
+FW_ERL_PREREQ_APPLICATIONS_EXTRA="[ combonodefinder, n54etsbugfix, tcerl ]"
 FW_ERL_APP_EXTRA="{ included_applications, [ mnesia ] }"
