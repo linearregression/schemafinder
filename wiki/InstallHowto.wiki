@@ -53,4 +53,4 @@ Then you are using bsd make which will not work.  Try again with gnu make, e.g.,
 
 == 2 ==
 
-Downloadable source tarballs use automake to build. A source code checkout of the repository uses [http://code.google.com/p/framewerk fwtemplates] to build, and if you don't know what that is, you probably want to stick with the tarballs.
+Downloadable source tarballs use make to build. A source code checkout of the repository uses [http://code.google.com/p/framewerk fwtemplates] to build, and if you don't know what that is, you probably want to stick with the tarballs.
