@@ -27,9 +27,9 @@ Unpack the [http://code.google.com/p/schemafinder/downloads/list tarball], then 
 The default prefix is {{{/usr}}} so if you are ok with that then you can omit the prefix argument.  Hopefully you will see something like[[#1 1]]
 {{{
 ...
-PASS: test-disaster
+PASS: copies-bug
 ==================
-All 6 tests passed
+All 7 tests passed
 ==================
 }}}
 If not, the test output for test foo is in {{{tests/test-foo.out}}}; perhaps it is informative.
