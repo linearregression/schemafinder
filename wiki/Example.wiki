@@ -1,4 +1,5 @@
 #summary Hello (distributed) world via schemafinder.
+#labels Featured
 
 = Prerequisities =
 
